@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -55,13 +56,10 @@ func run() error {
 			return err
 		}
 
-		os.WriteFile("holidays-"+fmt.Sprint(2019)+".json", jsonData, 0644)
-		file, err := os.Open("holidays-" + fmt.Sprint(2019) + ".json")
-		if err != nil {
-			return err
-		}
+		reader := bytes.NewReader(jsonData)
+
 		var lines []string
-		scanner := bufio.NewScanner(file)
+		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {
 			line := strings.Trim(scanner.Text(), " ")
 			line = strings.ReplaceAll(line, "\"", "")
@@ -87,8 +85,10 @@ func run() error {
 		if err != nil {
 			return err
 		}
-		os.WriteFile("parsed-holidays.json", []byte(json), 0644)
-		fmt.Println("Done")
+
+		fileName := "parsed-holidays.json"
+		os.WriteFile(fileName, []byte(json), 0644)
+		fmt.Print("Done, file saved to ./", fileName, "\n")
 	}
 
 	return nil
